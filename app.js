@@ -5,7 +5,7 @@ dotenv.config();
 const scraperBotToken = process.env.CORDSCRAPE_TOKEN;
 
 const app = express();
-app.use(express.static('public'));
+app.use(express.static(__dirname + '/public'));
 
 async function pullData(userId) {
     const headers = { "authorization": `Bot ${scraperBotToken}` };
