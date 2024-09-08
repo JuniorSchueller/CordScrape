@@ -1,0 +1,23 @@
+{
+  "name": "cordscrape",
+  "version": "1.0.0",
+  "description": "CordScrape is a service that pulls information from Discord users by ID.",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js"
+  },
+  "keywords": [
+    "cordscrape",
+    "discord",
+    "user",
+    "info",
+    "data"
+  ],
+  "author": "JuniorSchueller",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2"
+  }
+}
