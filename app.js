@@ -56,41 +56,55 @@ app.get('/user/:id', async (req, res) => {
     const userId = req.params.id;
     const userData = await pullData(userId);
 
-    const html = `
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Usuário - ${userData.username}</title>
-            <link rel="stylesheet" href="/css/styles.css">
-        </head>
-        <body>
-            <header>
-                <a href="/">Back</a>
-                <h1>User info</h1>
-            </header>
-            <main>
-                <div class="user-info">
-                    <div class="basic-info">
-                        <img src="https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png?size=256" alt="${userData.username}">
-                        <h2>${userData.username}#${userData.discriminator}</h2>
-                        <a href="/user/${userData.id}/json" class="json-button">
-                            <img src="/icons/json.png" alt="JSON"> JSON
-                        </a>
-                    </div>
-                    ${Object.keys(userData).filter(key => !['id', 'username', 'discriminator', 'avatar'].includes(key)).map(key => `
+    function renderNestedObject(obj) {
+        return `<ul>${Object.keys(obj).map(key => `
+            <li><strong>${key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}:</strong> 
+            ${typeof obj[key] === 'object' && obj[key] !== null ? renderNestedObject(obj[key]) : obj[key]}</li>
+        `).join('')}</ul>`;
+    }
+
+    res.send(`
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Usuário - ${userData.username}</title>
+        <link rel="stylesheet" href="/css/styles.css">
+    </head>
+    <body>
+        <header>
+            <a href="/">Back</a>
+            <h1>User info</h1>
+        </header>
+        <main>
+            <div class="user-info">
+                <div class="basic-info">
+                    <img src="https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png?size=256" alt="${userData.username}">
+                    <h2>${userData.username}#${userData.discriminator}</h2>
+                    <a href="/user/${userData.id}/json" class="json-button">
+                        <img src="/icons/json.png" alt="JSON"> JSON
+                    </a>
+                </div>
+                
+                ${Object.keys(userData).map(key => {
+                    if (['id', 'username', 'discriminator', 'avatar'].includes(key)) return '';
+                    return `
                         <div class="extra-info">
                             <strong>${key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}:</strong>
-                            <span>${userData[key]}</span>
+                            <span>
+                                ${typeof userData[key] === 'object' && userData[key] !== null 
+                                    ? renderNestedObject(userData[key]) 
+                                    : userData[key]}
+                            </span>
                         </div>
-                    `).join('')}
-                </div>
-            </main>
-        </body>
-        </html>
-    `;
-    res.send(html);
+                    `;
+                }).join('')}
+            </div>
+        </main>
+    </body>
+    </html>
+    `);
 });
 
 app.get('/user/:id/json', async (req, res) => {
